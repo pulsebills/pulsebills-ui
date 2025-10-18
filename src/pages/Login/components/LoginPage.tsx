@@ -1,14 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store";
+import { loginWithGoogleToken } from "../actions";
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  const handleGoogleLogin = () => {
-    // Handle Google OAuth login
-    console.log("Google login clicked");
-    navigate("/register-user");
-  };
+  const dispatch = useDispatch<AppDispatch>();
+
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      console.log(tokenResponse);
+      dispatch(loginWithGoogleToken(tokenResponse.access_token));
+      navigate("/register-user");
+    },
+    onError: () => {
+      console.error("Google Login Failed");
+    },
+  });
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
@@ -20,13 +31,12 @@ const LoginPage = () => {
           Organisation Admin.
         </p>
       </div>
-
       {/* Google Sign In Button */}
       <Button
         type="button"
         variant="outline"
         className="w-full flex items-center justify-center gap-3 py-6 border-gray-300"
-        onClick={handleGoogleLogin}
+        onClick={() => login()}
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path
