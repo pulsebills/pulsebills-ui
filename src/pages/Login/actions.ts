@@ -17,7 +17,7 @@ export const loginWithGoogleToken = createAsyncThunk(
 
       return response.data; // UserInfo
     } catch (error: unknown) {
-      return thunkAPI.rejectWithValue(error);
+      return thunkAPI.rejectWithValue(error.message || "Login failed");
     }
   }
 );

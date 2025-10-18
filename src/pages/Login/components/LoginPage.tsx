@@ -11,10 +11,21 @@ const LoginPage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const login = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      console.log(tokenResponse);
-      dispatch(loginWithGoogleToken(tokenResponse.access_token));
-      navigate("/register-user");
+    onSuccess: async (tokenResponse) => {
+      console.log("Token response:", tokenResponse);
+
+      // Dispatch Redux thunk to fetch user info
+      const resultAction = await dispatch(
+        loginWithGoogleToken(tokenResponse.access_token)
+      );
+
+      // Check if the thunk succeeded
+      if (loginWithGoogleToken.fulfilled.match(resultAction)) {
+        // User info successfully retrieved and stored
+        navigate("/register-user");
+      } else {
+        console.error("Login failed:", resultAction.payload);
+      }
     },
     onError: () => {
       console.error("Google Login Failed");
